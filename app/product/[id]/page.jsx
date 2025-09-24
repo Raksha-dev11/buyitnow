@@ -1,0 +1,29 @@
+import ProductDetails from '@/components/products/productDetails'
+import axios from 'axios';
+import mongoose from 'mongoose';
+import { redirect } from 'next/navigation';
+import React from 'react'
+
+const getProductDetails = async (id) => {
+  const {data} = await axios.get(`${process.env.API_URL}/api/products/${id}`);
+  return data?.product
+}
+
+const ProductDetailsPage = async ({ params }) => {
+
+
+  const isValidId = mongoose.isValidObjectId(params?.id)
+  if(!isValidId){
+    return redirect('/')
+  }
+
+  const { id } = await params;
+  const product = await getProductDetails(params?.id);
+  console.log(product)
+
+  return ( 
+    <productDetails product={product}/>
+  )
+}
+
+export default ProductDetailsPage;
