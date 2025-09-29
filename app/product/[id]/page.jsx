@@ -1,4 +1,4 @@
-import ProductDetails from '@/components/products/ProductDetails'
+import ProductDetails from '@/components/products/productDetails'
 import axios from 'axios';
 import mongoose from 'mongoose';
 import { redirect } from 'next/navigation';
