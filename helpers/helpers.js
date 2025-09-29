@@ -36,7 +36,7 @@ export const getCookieName = () => {
   }
 
   if (process.env.NODE_ENV === "production") {
-    cookieName = "__Secure-next-auth.session-token";
+    cookieName = "__Secure-next-auth.callback-url";
   }
 
   return cookieName;

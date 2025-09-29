@@ -1,4 +1,4 @@
-import ProductDetails from '@/components/products/productDetails'
+import ProductDetails from '@/components/products/ProductDetails'
 import axios from 'axios';
 import mongoose from 'mongoose';
 import { redirect } from 'next/navigation';
@@ -22,7 +22,7 @@ const ProductDetailsPage = async ({ params }) => {
   console.log(product)
 
   return ( 
-    <productDetails product={product}/>
+    <ProductDetails product={product}/>
   )
 }
 

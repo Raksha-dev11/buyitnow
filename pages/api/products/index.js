@@ -1,12 +1,12 @@
-import dbConnect from "@/backend/config/dbConnect"
-import { getProducts } from "@/backend/controllers/productControllers";
-import { default as nc } from "next-connect";
-import onError from "@/backend/middlewares/errors"
-
-const handler = nc( { onError } );
+import nc from "next-connect";
+import dbConnect from "@/backend/config/dbConnect";
+import { getProducts, newProduct } from "@/backend/controllers/productControllers";
 
 dbConnect();
 
+const handler = nc();
+
 handler.get(getProducts);
+handler.post(newProduct);
 
 export default handler;

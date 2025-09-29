@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  "@tailwindcss/postcss": {},
   env: {
     API_URL: process.env.API_URL,
     DB_URI: process.env.DB_URI,
