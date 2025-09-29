@@ -14,26 +14,40 @@ export const newProduct = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
+  try {
+    console.log('getProducts called with query:', req.query);
+    
+    const resPerPage = 3;
+    const productsCount = await Product.countDocuments();
+    
+    console.log('Total products count:', productsCount);
+    
+    const apiFilters = new APIFilters(Product.find(), req.query).search().filter();
 
-  const resPerPage = 3;
-  const productsCount = await Product.countDocuments();
-  
-  const apiFilters = new APIFilters(Product.find(), req.query).search().filter();
+    let products = await apiFilters.query;
 
-  let products = await apiFilters.query;
+    const filteredProductsCount = products.length;
+    
+    console.log('Filtered products count:', filteredProductsCount);
 
-  const filteredProductsCount = products.length;
+    apiFilters.pagination(resPerPage);
 
-  apiFilters.pagination(resPerPage);
+    products = await apiFilters.query.clone();
+    
+    console.log('Final products:', products?.length || 0);
 
-  products = await apiFilters.query.clone();
-
-  return res.status(200).json({
-    productsCount,
-    resPerPage,
-    filteredProductsCount,
-    products,
-  });
+    return res.status(200).json({
+      productsCount,
+      resPerPage,
+      filteredProductsCount,
+      products,
+    });
+  } catch (error) {
+    console.error('Error in getProducts:', error);
+    return res.status(500).json({
+      error: error.message || 'Internal server error'
+    });
+  }
 };
 
 export const getProduct = async (req, res, next) => {
