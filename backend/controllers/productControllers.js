@@ -14,40 +14,26 @@ export const newProduct = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
-  try {
-    console.log('getProducts called with query:', req.query);
-    
-    const resPerPage = 3;
-    const productsCount = await Product.countDocuments();
-    
-    console.log('Total products count:', productsCount);
-    
-    const apiFilters = new APIFilters(Product.find(), req.query).search().filter();
 
-    let products = await apiFilters.query;
+  const resPerPage = 3;
+  const productsCount = await Product.countDocuments();
+  
+  const apiFilters = new APIFilters(Product.find(), req.query).search().filter();
 
-    const filteredProductsCount = products.length;
-    
-    console.log('Filtered products count:', filteredProductsCount);
+  let products = await apiFilters.query;
 
-    apiFilters.pagination(resPerPage);
+  const filteredProductsCount = products.length;
 
-    products = await apiFilters.query.clone();
-    
-    console.log('Final products:', products?.length || 0);
+  apiFilters.pagination(resPerPage);
 
-    return res.status(200).json({
-      productsCount,
-      resPerPage,
-      filteredProductsCount,
-      products,
-    });
-  } catch (error) {
-    console.error('Error in getProducts:', error);
-    return res.status(500).json({
-      error: error.message || 'Internal server error'
-    });
-  }
+  products = await apiFilters.query.clone();
+
+  return res.status(200).json({
+    productsCount,
+    resPerPage,
+    filteredProductsCount,
+    products,
+  });
 };
 
 export const getProduct = async (req, res, next) => {
@@ -113,7 +99,6 @@ export const deleteProduct = async (req, res, next) => {
     return next(new ErrorHandler("Product not found.", 404));
   }
 
-  // Deleting images associated with the product
   for (let i = 0; i < product.images.length; i++) {
     const res = await cloudinary.v2.uploader.destroy(
       product.images[i].public_id

@@ -4,16 +4,14 @@ import queryString from 'query-string';
 import React from 'react'
 
 const getProducts = async (searchParams) => {
-  // Await searchParams for Next.js 15 compatibility
-  const params = await searchParams;
 
   const urlParams = {
-    keyword: params.keyword,
-    page: params.page,
-    category: params.category,
-    "ratings[gte]": params.ratings,
-    "price[gte]": params.min,
-    "price[lte]": params.max,
+    keyword: searchParams.keyword,
+    page: searchParams.page,
+    category: searchParams.category,
+    "ratings[gte]": searchParams.ratings,
+    "price[gte]": searchParams.min,
+    "price[lte]": searchParams.max,
   }
 
   const searchQuery = queryString.stringify(urlParams)
