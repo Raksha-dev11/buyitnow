@@ -6,7 +6,7 @@ import { createContext, useState, useEffect } from "react";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({ cartItems: [] });
 
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export const CartProvider = ({ children }) => {
     setCart(
       localStorage.getItem("cart")
       ? JSON.parse(localStorage.getItem('cart'))
-      : []
+      : { cartItems: [] }
     )
   }
 

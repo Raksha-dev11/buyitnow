@@ -15,7 +15,7 @@ const ProductItem = ({ product }) => {
       product: product._id,
       name: product.name,
       price: product.price,
-      image: product.images[0].url,
+      image: product?.images?.[0]?.url || "/images/default_product.png",
       stock: product.stock,
       seller: product.seller,
     })
