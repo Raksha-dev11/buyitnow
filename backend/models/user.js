@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please enter your password'],
+        required: false, // Optional for OAuth users
         minLength: [6, 'Your password must be longer than 6 characters'],
         select: false
     },
@@ -32,11 +32,11 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.pre('save', async function (next) {
-    if (!this.isModified("password")) {
+    if (!this.isModified("password") || !this.password) {
         next()
+    } else {
+        this.password = await bcrypt.hash(this.password, 10)
     }
-
-    this.password = await bcrypt.hash(this.password, 10)
 })
 
 export default mongoose.models.User || mongoose.model("User", userSchema)

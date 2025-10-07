@@ -102,45 +102,98 @@ export const canReview = async (req, res) => {
 };
 
 export const checkoutSession = async (req, res) => {
-  const body = req.body;
+  try {
+    const body = req.body;
+    
+    console.log('=== CHECKOUT SESSION START ===');
+    console.log('User:', req?.user);
+    console.log('Body:', JSON.stringify(body, null, 2));
 
-  const line_items = body?.items?.map((item) => {
-    return {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.name,
-          images: [item.image],
-          metadata: { productId: item.product },
+    // Validate user
+    if (!req?.user) {
+      console.error('No user found in request');
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    // Validate cart items
+    if (!body?.items || body.items.length === 0) {
+      console.error('No items in cart');
+      return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    // Validate shipping info
+    if (!body?.shippingInfo) {
+      console.error('No shipping info');
+      return res.status(400).json({ message: "Shipping information is required" });
+    }
+
+    console.log('Creating line items...');
+    
+    // Use production URL directly
+    const baseUrl = 'https://buyitnow.vercel.app';
+    
+    const line_items = body?.items?.map((item) => {
+      // Convert relative image URLs to absolute URLs
+      let imageUrl = item.image;
+      if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        imageUrl = `${baseUrl}${imageUrl}`;
+      }
+      
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name,
+            images: [imageUrl],
+            metadata: { productId: item.product },
+          },
+          unit_amount: item.price * 100,
         },
-        unit_amount: item.price * 100,
-      },
-      tax_rates: ["txr_1S8b504GesFA6esaG9XKWMyr"],
-      quantity: item.quantity,
+        quantity: item.quantity,
+      };
+    });
+    console.log('Line items created:', line_items.length);
+
+    const shippingInfo = body?.shippingInfo;
+    
+    // Ensure _id is a string (handles both MongoDB ObjectId and string)
+    const userId = req.user._id?.toString() || req.user._id;
+    
+    const sessionConfig = {
+      payment_method_types: ["card"],
+      success_url: `${baseUrl}/me/orders?order_success=true`,
+      cancel_url: `${baseUrl}`,
+      customer_email: req?.user?.email,
+      client_reference_id: userId,
+      mode: "payment",
+      metadata: { shippingInfo: String(shippingInfo) },
+      line_items,
     };
-  });
+    
+    console.log('Session config:', JSON.stringify(sessionConfig, null, 2));
+    console.log('Creating Stripe session...');
 
-  const shippingInfo = body?.shippingInfo;
+    const session = await stripe.checkout.sessions.create(sessionConfig);
+    
+    console.log('Stripe session created successfully:', session.id);
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    success_url: `${process.env.API_URL}/me/orders?order_success=true`,
-    cancel_url: `${process.env.API_URL}`,
-    customer_email: req?.user?.email,
-    client_reference_id: req?.user?._id,
-    mode: "payment",
-    metadata: { shippingInfo },
-    shipping_options: [
-      {
-        shipping_rate: "shr_1S8ams4GesFA6esaoqCCD5IE",
-      },
-    ],
-    line_items,
-  });
-
-  res.status(200).json({
-    url: session.url,
-  });
+    res.status(200).json({
+      url: session.url,
+    });
+  } catch (error) {
+    console.error("Checkout session error:", error);
+    console.error("Error details:", {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+      statusCode: error.statusCode,
+    });
+    res.status(500).json({ 
+      message: "Failed to create checkout session",
+      error: error.message,
+      details: error.type || error.code
+    });
+  }
 };
 
 

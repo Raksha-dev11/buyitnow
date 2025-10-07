@@ -5,6 +5,10 @@ const nextConfig = {
     DB_URI: process.env.DB_URI,
     
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 
     CLOUD_NAME: process.env.CLOUD_NAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
@@ -14,8 +18,6 @@ const nextConfig = {
     STRIPE_PRIVATE_KEY: process.env.STRIPE_PRIVATE_KEY,
 
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
   images: {
     domains: ["res.cloudinary.com"],
